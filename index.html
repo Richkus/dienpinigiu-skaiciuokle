@@ -230,17 +230,8 @@
     .row__error[hidden] { display: none; }
     .row__error .msg { display: flex; align-items: center; gap: 4px; }
     .row__error .msg img { flex: none; }
-    .row__error .suggest { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 8px; }
-    .row__error .suggest button {
-      height: 30px; padding: 0 12px;
-      border: 1px solid var(--ds-border-focus); border-radius: 6px;
-      background: var(--ds-surface-card); color: #006A6E;
-      font-size: 13px; font-weight: 600; cursor: pointer;
-      transition: var(--ms-transition);
-    }
-    .row__error .suggest button:hover { background: var(--ds-border-focus); color: var(--ms-white); }
 
-    /* Sąrašas (bendras A ir B variantams) – DS V.3 Modal paviršius */
+    /* Sąrašas – DS V.3 Modal paviršius */
     .listbox {
       list-style: none; margin: 0; padding: 8px;
       max-height: 288px; overflow-y: auto;
@@ -256,8 +247,11 @@
     .option mark { background: none; color: inherit; font-weight: 700; }
     .option:hover { background: var(--ds-surface-secondary); }
     .option.is-active { background: var(--ds-surface-secondary); box-shadow: inset 2px 0 0 var(--ds-border-focus); }
-    .option.is-selected { font-weight: 600; }
-    .option.is-selected::after { content: "✓"; float: right; color: var(--ds-border-focus); font-weight: 700; }
+    .option.is-selected {
+      padding-right: 36px;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16' fill='none'%3E%3Cpath d='M3 8.5l3.2 3L13 4.5' stroke='%23038389' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 12px center; background-size: 16px;
+    }
     .listbox__empty { padding: 8px 12px; font-size: 14px; line-height: 20px; color: var(--ds-text-disabled); }
     .popup {
       position: absolute; left: 0; right: 0; top: calc(100% + 6px); z-index: 20;
@@ -272,12 +266,6 @@
     @keyframes popup-in { from { opacity: 0; transform: translateY(-4px); } }
     .popup__hint { padding: 4px 12px; font-size: 13px; line-height: 20px; color: var(--ds-text-disabled); }
 
-    /* A: rašomas laukas */
-    .combo input {
-      padding: 0 38px 0 10px;
-      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-    }
-    .combo input::placeholder, .picker__value.is-placeholder { color: var(--ms-text-subtle); }
     .control__chev { transition: transform .15s ease; }
     .is-expanded .control__chev { transform: rotate(-90deg); }
 
@@ -308,23 +296,6 @@
 
     .control.is-invalid { border-color: var(--ds-border-error); box-shadow: inset 0 0 0 1px var(--ds-border-error); }
     .readonly.is-empty, .total output.is-empty { color: var(--ms-text-subtle); }
-
-    /* Prototipo variantų jungiklis (ne dizaino dalis) */
-    .proto-switch {
-      position: fixed; right: 16px; bottom: 16px; z-index: 50;
-      display: flex; align-items: center; gap: 8px;
-      padding: 8px 10px 8px 14px;
-      background: var(--ms-teal-900); color: var(--ms-white);
-      border-radius: var(--ms-radius-pill);
-      box-shadow: var(--ms-shadow-float);
-      font-size: 13px;
-    }
-    .proto-switch button {
-      padding: 5px 12px; border: 0; border-radius: var(--ms-radius-pill);
-      background: transparent; color: var(--ms-white); font-size: 13px; font-weight: 600; cursor: pointer;
-      transition: var(--ms-transition);
-    }
-    .proto-switch button[aria-pressed="true"] { background: var(--ms-white); color: var(--ms-teal-900); }
 
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { transition: none !important; animation: none !important; }
@@ -361,16 +332,17 @@
     .control--days input::-webkit-outer-spin-button,
     .control--days input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
     .spin {
-      position: absolute; right: 5px; top: 11px;
-      display: flex; flex-direction: column; align-items: center;
+      position: absolute; right: 5px; top: 50%; transform: translateY(-50%);
+      display: flex; flex-direction: column;
     }
     .spin button {
-      width: 13px; height: 8px; padding: 0; border: 0; background: none; cursor: pointer;
-      display: flex; align-items: center; justify-content: center; overflow: hidden;
+      width: 14px; height: 9px; padding: 0; border: 0; background: none; cursor: pointer;
+      display: flex; justify-content: center;
     }
+    .spin .up { align-items: flex-end; padding-bottom: 1.5px; }
+    .spin .down { align-items: flex-start; padding-top: 1.5px; }
     .spin .up img { transform: scaleY(-1); }
-    .spin .down { margin-top: -1px; }
-    .spin .down img { width: 13px; height: 13px; margin-top: -4px; }
+    .spin button:hover img { opacity: .7; }
     .readonly {
       display: flex; align-items: center; justify-content: flex-end;
       height: 40px; padding: 8px 10px;
@@ -640,11 +612,6 @@
     </div>
   </div>
 
-  <div class="proto-switch" role="group" aria-label="Šalies lauko variantas">
-    <span>Šalies laukas:</span>
-    <button type="button" data-variant="a">A. Rašymas</button>
-    <button type="button" data-variant="b">B. Sąrašas su paieška</button>
-  </div>
 
   <script>
     // Pavyzdinės normos (EUR/d.), ne tikri duomenys
@@ -696,27 +663,27 @@
       return esc(name.slice(0, i)) + '<mark>' + esc(name.slice(i, i + len)) + '</mark>' + esc(name.slice(i + len));
     }
 
-    const params = new URLSearchParams(location.search);
-    let variant = params.get('v') === 'b' ? 'b' : 'a';
     let rows = [];
     let seq = 0;
     const rowsEl = document.getElementById('rows');
     const totalEl = document.getElementById('total');
 
     function newRow() {
-      return { id: ++seq, country: null, text: '', days: 1, touched: false };
+      return { id: ++seq, country: null, days: 1, touched: false };
     }
 
-    /* ---------- Bendras sąrašo valdymas ---------- */
+    /* ---------- Sąrašo valdymas ---------- */
     function listController(listEl, onPick) {
-      let items = [], active = 0, query = '';
+      // active = -1: niekas nepažymėta (atidarius be pasirinkimo ir be paieškos teksto)
+      let items = [], active = -1, query = '';
       function render(q, selected) {
         const res = lookup(q);
-        query = res.q; items = res.items; active = 0;
-        if (selected) { const i = items.indexOf(selected); if (i > -1) active = i; }
+        query = res.q; items = res.items;
+        const i = selected ? items.indexOf(selected) : -1;
+        active = i > -1 ? i : (query ? 0 : -1);
         listEl.innerHTML = items.length
           ? (res.loose ? `<li class="popup__hint" role="presentation">Gal ieškote:</li>` : '') +
-            items.map((c, i) => `<li class="option${i === active ? ' is-active' : ''}${c === selected ? ' is-selected' : ''}" role="option" id="${listEl.id}-${i}" data-i="${i}">${highlight(c.name, query)}</li>`).join('')
+            items.map((c, i) => `<li class="option${c === selected ? ' is-selected' : ''}" role="option" aria-selected="${c === selected}" id="${listEl.id}-${i}" data-i="${i}">${highlight(c.name, query)}</li>`).join('')
           : `<li class="listbox__empty">Tokios šalies neradome</li>`;
         sync();
       }
@@ -725,13 +692,17 @@
         const el = listEl.querySelector('.is-active');
         if (el) el.scrollIntoView({ block: 'nearest' });
       }
-      function move(d) { if (!items.length) return; active = (active + d + items.length) % items.length; sync(); }
+      function move(d) {
+        if (!items.length) return;
+        active = active === -1 ? (d > 0 ? 0 : items.length - 1) : (active + d + items.length) % items.length;
+        sync();
+      }
       listEl.addEventListener('mousedown', e => e.preventDefault());
       listEl.addEventListener('click', e => {
         const li = e.target.closest('.option');
         if (li) onPick(items[+li.dataset.i]);
       });
-      return { render, move, current: () => items[active], count: () => items.length, activeId: () => items.length ? `${listEl.id}-${active}` : '' };
+      return { render, move, current: () => items[active] };
     }
 
     /* ---------- Eilutė ---------- */
@@ -739,33 +710,26 @@
       const el = document.createElement('div');
       el.className = 'row';
       const listId = `list-${row.id}`;
-      const countryHtml = variant === 'a'
-        ? `<div class="control combo">
-             <input type="text" role="combobox" aria-label="Šalis" aria-autocomplete="list" aria-expanded="false" aria-controls="${listId}" placeholder="Pradėkite rašyti, pvz. Vokietija" autocomplete="off">
-             <img class="control__chev" src="${ICON_CHEV}" width="20" height="20" alt="">
-             <div class="popup"><ul class="listbox" role="listbox" id="${listId}"></ul></div>
-           </div>`
-        : `<div class="picker">
-             <button type="button" class="control picker__btn" aria-haspopup="listbox" aria-expanded="false" aria-label="Šalis">
-               <span class="picker__value"></span>
-               <img class="control__chev" src="${ICON_CHEV}" width="20" height="20" alt="">
-             </button>
-             <div class="popup">
-               <div class="popup__search">
-                 <img src="assets/icons/padidke.svg" width="18" height="18" alt="">
-                 <input type="text" placeholder="Ieškoti šalies..." aria-label="Ieškoti šalies" aria-controls="${listId}" autocomplete="off">
-               </div>
-               <ul class="listbox" role="listbox" id="${listId}"></ul>
-             </div>
-           </div>`;
       el.innerHTML = `
-        ${countryHtml}
+        <div class="picker">
+          <button type="button" class="control picker__btn" aria-haspopup="listbox" aria-expanded="false" aria-label="Šalis">
+            <span class="picker__value"></span>
+            <img class="control__chev" src="${ICON_CHEV}" width="20" height="20" alt="">
+          </button>
+          <div class="popup">
+            <div class="popup__search">
+              <img src="assets/icons/padidke.svg" width="18" height="18" alt="">
+              <input type="text" placeholder="Ieškoti šalies..." aria-label="Ieškoti šalies" aria-controls="${listId}" autocomplete="off">
+            </div>
+            <ul class="listbox" role="listbox" id="${listId}"></ul>
+          </div>
+        </div>
         <output class="readonly js-norm" aria-label="Norma"></output>
         <div class="control control--days">
           <input type="number" min="1" max="365" inputmode="numeric" aria-label="Dienos">
           <div class="spin">
             <button class="up" type="button" tabindex="-1" aria-label="Daugiau dienų"><img src="assets/icons/spin-up.svg" width="6" height="6" alt=""></button>
-            <button class="down" type="button" tabindex="-1" aria-label="Mažiau dienų"><img src="assets/icons/spin-down.svg" width="13" height="13" alt=""></button>
+            <button class="down" type="button" tabindex="-1" aria-label="Mažiau dienų"><img src="assets/icons/spin-up.svg" width="6" height="6" alt=""></button>
           </div>
         </div>
         <output class="readonly js-sum" aria-label="Suma"></output>
@@ -775,93 +739,44 @@
       const daysInput = el.querySelector('.control--days input');
       daysInput.value = row.days;
 
-      const pick = (c, focusDays = true) => {
-        row.country = c; row.text = c.name; row.touched = true;
+      const picker = el.querySelector('.picker');
+      const btn = el.querySelector('.picker__btn');
+      const popup = el.querySelector('.popup');
+      const q = el.querySelector('.popup__search input');
+      const list = listController(el.querySelector('.listbox'), c => pick(c));
+
+      function pick(c) {
+        row.country = c; row.touched = true;
         close();
         update();
-        if (focusDays) { daysInput.focus(); daysInput.select(); }
-      };
-
-      let open, close;
-      if (variant === 'a') {
-        const input = el.querySelector('.combo input');
-        const control = el.querySelector('.combo');
-        const popup = el.querySelector('.popup');
-        const list = listController(el.querySelector('.listbox'), c => pick(c));
-        input.value = row.text;
-        open = () => {
-          list.render(row.country && input.value === row.country.name ? '' : input.value, row.country);
-          popup.classList.add('is-open'); control.classList.add('is-expanded');
-          input.setAttribute('aria-expanded', 'true');
-          input.setAttribute('aria-activedescendant', list.activeId());
-        };
-        close = () => {
-          popup.classList.remove('is-open'); control.classList.remove('is-expanded');
-          input.setAttribute('aria-expanded', 'false');
-          input.removeAttribute('aria-activedescendant');
-        };
-        input.addEventListener('focus', () => { input.select(); open(); });
-        input.addEventListener('click', open);
-        input.addEventListener('input', () => {
-          row.text = input.value;
-          row.country = null;
-          open();
-          update();
-        });
-        input.addEventListener('keydown', e => {
-          const isOpen = popup.classList.contains('is-open');
-          if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
-            e.preventDefault();
-            if (!isOpen) open(); else list.move(e.key === 'ArrowDown' ? 1 : -1);
-            input.setAttribute('aria-activedescendant', list.activeId());
-          } else if (e.key === 'Enter') {
-            e.preventDefault();
-            if (isOpen && list.count()) pick(list.current());
-          } else if (e.key === 'Tab') {
-            // Tab paima pažymėtą pasiūlymą, jei žmogus kažką įvedė
-            if (isOpen && list.count() && input.value.trim() && !row.country) pick(list.current(), false);
-          } else if (e.key === 'Escape') {
-            close();
-          }
-        });
-        input.addEventListener('blur', () => {
-          close();
-          row.touched = row.touched || input.value.trim() !== '';
-          if (row.country) input.value = row.country.name;
-          update();
-        });
-      } else {
-        const btn = el.querySelector('.picker__btn');
-        const popup = el.querySelector('.popup');
-        const q = el.querySelector('.popup__search input');
-        const list = listController(el.querySelector('.listbox'), c => pick(c));
-        open = () => {
-          q.value = '';
-          list.render('', row.country);
-          popup.classList.add('is-open'); el.querySelector('.picker').classList.add('is-expanded');
-          btn.setAttribute('aria-expanded', 'true');
-          q.focus();
-        };
-        close = (toButton) => {
-          if (!popup.classList.contains('is-open')) return;
-          popup.classList.remove('is-open'); el.querySelector('.picker').classList.remove('is-expanded');
-          btn.setAttribute('aria-expanded', 'false');
-          if (!row.country) { row.touched = true; update(); }
-          if (toButton) btn.focus();
-        };
-        btn.addEventListener('click', () => popup.classList.contains('is-open') ? close(true) : open());
-        btn.addEventListener('keydown', e => {
-          if (e.key === 'ArrowDown') { e.preventDefault(); open(); }
-        });
-        q.addEventListener('input', () => list.render(q.value, row.country));
-        q.addEventListener('keydown', e => {
-          if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); list.move(e.key === 'ArrowDown' ? 1 : -1); }
-          else if (e.key === 'Enter') { e.preventDefault(); if (list.count()) pick(list.current()); }
-          else if (e.key === 'Escape') { e.preventDefault(); close(true); }
-          else if (e.key === 'Tab') { close(); }
-        });
-        document.addEventListener('mousedown', e => { if (!el.querySelector('.picker').contains(e.target)) close(); });
+        daysInput.focus(); daysInput.select();
       }
+      function open() {
+        q.value = '';
+        list.render('', row.country);
+        popup.classList.add('is-open'); picker.classList.add('is-expanded');
+        btn.setAttribute('aria-expanded', 'true');
+        q.focus();
+      }
+      function close(toButton) {
+        if (!popup.classList.contains('is-open')) return;
+        popup.classList.remove('is-open'); picker.classList.remove('is-expanded');
+        btn.setAttribute('aria-expanded', 'false');
+        if (!row.country) { row.touched = true; update(); }
+        if (toButton) btn.focus();
+      }
+      btn.addEventListener('click', () => popup.classList.contains('is-open') ? close(true) : open());
+      btn.addEventListener('keydown', e => {
+        if (e.key === 'ArrowDown') { e.preventDefault(); open(); }
+      });
+      q.addEventListener('input', () => list.render(q.value, row.country));
+      q.addEventListener('keydown', e => {
+        if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); list.move(e.key === 'ArrowDown' ? 1 : -1); }
+        else if (e.key === 'Enter') { e.preventDefault(); if (list.current()) pick(list.current()); }
+        else if (e.key === 'Escape') { e.preventDefault(); close(true); }
+        else if (e.key === 'Tab') { close(); }
+      });
+      document.addEventListener('mousedown', e => { if (!picker.contains(e.target)) close(); });
 
       // Dienos
       const setDays = v => {
@@ -883,17 +798,6 @@
         renderRows();
       });
 
-      // Klaidos pasiūlymai
-      el.querySelector('.row__error').addEventListener('click', e => {
-        const b = e.target.closest('[data-pick]');
-        if (b) {
-          const c = COUNTRIES.find(c => c.id === +b.dataset.pick);
-          const input = el.querySelector('.combo input');
-          if (input) input.value = c.name;
-          pick(c);
-        }
-      });
-
       row.el = el;
       return el;
     }
@@ -906,31 +810,15 @@
       norm.classList.toggle('is-empty', !row.country);
       sum.classList.toggle('is-empty', !row.country);
 
-      if (variant === 'b') {
-        const v = el.querySelector('.picker__value');
-        v.textContent = row.country ? row.country.name : 'Pasirinkite šalį';
-        v.classList.toggle('is-placeholder', !row.country);
-      }
+      const v = el.querySelector('.picker__value');
+      v.textContent = row.country ? row.country.name : 'Pasirinkite šalį';
+      v.classList.toggle('is-placeholder', !row.country);
 
       const invalid = row.touched && !row.country;
-      el.querySelector('.combo, .picker__btn').classList.toggle('is-invalid', invalid);
+      el.querySelector('.picker__btn').classList.toggle('is-invalid', invalid);
       const err = el.querySelector('.row__error');
       err.hidden = !invalid;
-      if (invalid) {
-        const text = variant === 'a' ? row.text.trim() : '';
-        const hits = text ? search(text) : [];
-        const msg = t => `<div class="msg"><img src="assets/icons/exclamation-circle.svg" width="13" height="13" alt="">${t}</div>`;
-        if (text && !hits.length) {
-          err.innerHTML = msg(`Neradome šalies „${esc(text)}“. Pasirinkite šalį iš sąrašo.`);
-        } else if (hits.length) {
-          err.innerHTML = msg('Šalis nepasirinkta. Pasirinkite ją iš sąrašo.') + `
-            <div class="suggest">Gal turėjote omenyje:
-              ${hits.slice(0, 3).map(c => `<button type="button" data-pick="${c.id}">${esc(c.name)}</button>`).join('')}
-            </div>`;
-        } else {
-          err.innerHTML = msg('Pasirinkite šalį iš sąrašo.');
-        }
-      }
+      if (invalid) err.innerHTML = `<div class="msg"><img src="assets/icons/exclamation-circle.svg" width="13" height="13" alt="">Pasirinkite šalį iš sąrašo.</div>`;
       el.querySelector('.row__remove').hidden = rows.length < 2;
     }
 
@@ -952,24 +840,11 @@
       rows.push(r);
       rowsEl.appendChild(buildRow(r));
       update();
-      r.el.querySelector(variant === 'a' ? '.combo input' : '.picker__btn').focus();
+      r.el.querySelector('.picker__btn').focus();
     });
 
-    // Variantų jungiklis
-    const switchBtns = document.querySelectorAll('.proto-switch button');
-    function setVariant(v) {
-      variant = v;
-      switchBtns.forEach(b => b.setAttribute('aria-pressed', String(b.dataset.variant === v)));
-      const url = new URL(location.href);
-      url.searchParams.set('v', v);
-      history.replaceState(null, '', url);
-      rows.forEach(r => { if (r.country) r.text = r.country.name; });
-      renderRows();
-    }
-    switchBtns.forEach(b => b.addEventListener('click', () => setVariant(b.dataset.variant)));
-
     rows = [newRow()];
-    setVariant(variant);
+    renderRows();
   </script>
 
 </body>

@@ -4,21 +4,15 @@ Mokesčių SUFLERIO dienpinigių skaičiuoklės prototipas. Tikslas: išspręsti
 
 **Peržiūra:** https://richkus.github.io/dienpinigiu-skaiciuokle/
 
-## Variantai
+## Kaip veikia šalies laukas
 
-Perjungiama apačioje dešinėje arba nuoroda:
+Šalies laukas yra mygtukas, į jį rašyti negalima. Paspaudus atsidaro skydelis su paieškos laukeliu ir šalių sąrašu. Taip lauke niekada nelieka parašyto teksto, kuris atrodo kaip pasirinkta šalis, bet ja nėra.
 
-| Nuoroda | Kas tai |
-|---|---|
-| [`?v=a`](https://richkus.github.io/dienpinigiu-skaiciuokle/?v=a) | **A · Rašymas.** Dabartinis laukas su pataisymais: jei šalis nepasirinkta, laukas paraudonuoja, rodoma klaida ir pasiūlymas „Gal turėjote omenyje“. Enter / Tab paima pažymėtą pasiūlymą. |
-| [`?v=b`](https://richkus.github.io/dienpinigiu-skaiciuokle/?v=b) | **B · Sąrašas su paieška.** Laukas yra mygtukas, į jį rašyti negalima. Paspaudus atsidaro skydelis su paieškos laukeliu ir sąrašu. |
-
-Abiem atvejais:
-
-- kol šalis nepasirinkta, Norma ir Suma rodo „–“, ne 0,00 €;
-- paieška nekreipia dėmesio į lietuviškas raides ir ieško bet kurio žodžio pradžios („karalyst“ randa Jungtinę Karalystę);
-- jei tikslaus atitikmens nėra, nukerpamos 1-2 paskutinės raidės ir rodoma „Gal ieškote:“ („Vokietija“ → „Vokietijos Federacinė Respublika“);
-- galima pridėti kelias šalis, skaičiuojama bendra suma.
+- Atidarius be pasirinkimo nieko nepažymėta. Pradėjus rašyti pažymimas pirmas atitikmuo, Enter jį pasirenka. Pasirinkta šalis sąraše pažymėta varnele.
+- Paieška nekreipia dėmesio į lietuviškas raides ir ieško bet kurio žodžio pradžios („karalyst“ randa Jungtinę Karalystę).
+- Jei tikslaus atitikmens nėra, nukerpamos 1-2 paskutinės raidės ir rodoma „Gal ieškote:“ („Vokietija“ → „Vokietijos Federacinė Respublika“).
+- Kol šalis nepasirinkta, Norma ir Suma rodo „–“, ne 0,00 €. Uždarius skydelį nepasirinkus šalies, laukas paraudonuoja ir rodoma „Pasirinkite šalį iš sąrašo.“
+- Galima pridėti kelias šalis, skaičiuojama bendra suma.
 
 Normos yra **pavyzdinės**, ne tikri duomenys. Sąraše 28 šalys.
 
