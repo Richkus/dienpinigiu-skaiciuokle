@@ -343,6 +343,14 @@
     .spin .down { align-items: flex-start; padding-top: 1.5px; }
     .spin .up img { transform: scaleY(-1); }
     .spin button:hover img { opacity: .7; }
+    .control--days.is-disabled {
+      background: var(--ds-surface-secondary);
+      border-color: var(--ds-border-subtle);
+      color: var(--ds-text-disabled);
+    }
+    .control--days.is-disabled input { cursor: not-allowed; }
+    .control--days.is-disabled .spin { opacity: .35; }
+    .control--days.is-disabled .spin button { cursor: not-allowed; }
     .readonly {
       display: flex; align-items: center; justify-content: flex-end;
       height: 40px; padding: 8px 10px;
@@ -782,12 +790,11 @@
       const setDays = v => {
         const n = Math.min(365, Math.max(0, parseInt(v, 10) || 0));
         row.days = n; daysInput.value = n;
-        if (!row.country) row.touched = true;
         update();
       };
       daysInput.addEventListener('input', () => {
         const n = parseInt(daysInput.value, 10);
-        if (n >= 0) { row.days = Math.min(365, n); if (!row.country) row.touched = true; update(); }
+        if (n >= 0) { row.days = Math.min(365, n); update(); }
       });
       daysInput.addEventListener('blur', () => setDays(daysInput.value));
       el.querySelector('.spin .up').addEventListener('click', () => setDays(row.days + 1));
@@ -809,6 +816,11 @@
       sum.textContent = row.country ? money(row.country.norm * row.days) : '–';
       norm.classList.toggle('is-empty', !row.country);
       sum.classList.toggle('is-empty', !row.country);
+
+      // Dienos aktyvios tik pasirinkus šalį
+      const daysCtl = el.querySelector('.control--days');
+      daysCtl.classList.toggle('is-disabled', !row.country);
+      daysCtl.querySelectorAll('input, button').forEach(n => n.disabled = !row.country);
 
       const v = el.querySelector('.picker__value');
       v.textContent = row.country ? row.country.name : 'Pasirinkite šalį';
