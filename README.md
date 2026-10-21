@@ -4,6 +4,10 @@ Mokesčių SUFLERIO dienpinigių skaičiuoklės prototipas. Tikslas: išspręsti
 
 **Peržiūra:** https://richkus.github.io/dienpinigiu-skaiciuokle/
 
+## Pilkas režimas
+
+Kad prototipas neatrodytų kaip tikra svetainė, pagal nutylėjimą jis rodomas pilkai: kaip Figmoje, ant viso puslapio uždėtas juodas sluoksnis su „Color“ maišymo režimu (`mix-blend-mode: color`). Išjungiama jungikliu „Pilkas režimas“ apačioje dešinėje, pasirinkimą naršyklė prisimena. Spalvotą versiją iškart atidaro [`?spalvos=1`](https://richkus.github.io/dienpinigiu-skaiciuokle/?spalvos=1).
+
 ## Kaip veikia šalies laukas
 
 Šalies laukas yra mygtukas, į jį rašyti negalima. Paspaudus atsidaro skydelis su paieškos laukeliu ir šalių sąrašu. Taip lauke niekada nelieka parašyto teksto, kuris atrodo kaip pasirinkta šalis, bet ja nėra.
