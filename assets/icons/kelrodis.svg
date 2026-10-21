@@ -1,0 +1,21 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="15.75" height="17.25" viewBox="0 0 15.75 17.25" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="20/kelrodis">
+<mask id="stroke0_0_14" maskUnits="userSpaceOnUse" x="4.875" y="-0.25" width="6" height="5" fill="black">
+<rect fill="white" x="4.875" y="-0.25" width="6" height="5"/>
+<path d="M8.875 2.75L8.875 2.71296C8.875 2.71296 8.49171 1.75 7.875 1.75C7.25829 1.75 6.875 2.71296 6.875 2.71296L6.875 2.75L8.875 2.75Z"/>
+</mask>
+<path id="Rectangle 1138" d="M8.875 2.75L8.875 2.71296C8.875 2.71296 8.49171 1.75 7.875 1.75C7.25829 1.75 6.875 2.71296 6.875 2.71296L6.875 2.75L8.875 2.75Z" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" stroke="#00555A" mask="url(#stroke0_0_14)"/>
+<mask id="stroke1_0_14" maskUnits="userSpaceOnUse" x="4.75" y="11.5" width="6" height="6" fill="black">
+<rect fill="white" x="4.75" y="11.5" width="6" height="6"/>
+<path d="M8.75 15.5L8.75 13.75C8.75 13.75 8.41462 13.75 7.875 13.75C7.33538 13.75 7 13.75 7 13.75L7 15.5L8.75 15.5Z"/>
+</mask>
+<path id="Rectangle 1140" d="M8.75 15.5L8.75 13.75C8.75 13.75 8.41462 13.75 7.875 13.75C7.33538 13.75 7 13.75 7 13.75L7 15.5L8.75 15.5Z" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" stroke="#00555A" mask="url(#stroke1_0_14)"/>
+<mask id="stroke2_0_14" maskUnits="userSpaceOnUse" x="4.75" y="5.75" width="6" height="5" fill="black">
+<rect fill="white" x="4.75" y="5.75" width="6" height="5"/>
+<path d="M8.75 8.75L8.75 7.875C8.75 7.875 8.41462 7.875 7.875 7.875C7.33538 7.875 7 7.875 7 7.875L7 8.75L8.75 8.75Z"/>
+</mask>
+<path id="Rectangle 1141" d="M8.75 8.75L8.75 7.875C8.75 7.875 8.41462 7.875 7.875 7.875C7.33538 7.875 7 7.875 7 7.875L7 8.75L8.75 8.75Z" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" stroke="#00555A" mask="url(#stroke2_0_14)"/>
+<path id="Rectangle 1138_2" d="M14.875 9.75H2.43056L0.875 11.25L2.43056 12.75H14.875V9.75Z" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" stroke="#00555A"/>
+<path id="Rectangle 1139" d="M0.875 3.75H12.4306L13.875 5.25L12.4306 6.75H0.875V3.75Z" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" stroke="#00555A"/>
+</g>
+</svg>

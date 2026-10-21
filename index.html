@@ -1,0 +1,976 @@
+<!doctype html>
+<html lang="lt">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Dienpinigių skaičiuoklė: prototipas</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&family=Enriqueta:wght@600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="svetaine-tokens.css">
+  <style>
+    /* Reikšmės, kurių nėra svetaine-tokens.css – NAUJAS, įtraukti į DS */
+    :root {
+      --ms-calc-bg: #E2F1F1;          /* skaičiuoklės kortelės fonas */
+      --ms-calc-readonly: #CBE6E6;    /* neredaguojami laukai (Norma, Suma) */
+      --ms-cream-50: #FCF9F4;         /* tinklelio fono viršus */
+      --ms-cream-100: #F8F5F0;        /* atmintinės kortelė */
+      --ms-cream-300: #E4DBCC;        /* tinklelio linijos, atmintinės rėmelis */
+      --ms-radius-calc: 10px;
+
+      /* DS V.3 (Figma: Inputs 8138:3541, Modals 8138:5355) */
+      --ds-surface-card: #FFFFFF;
+      --ds-surface-secondary: #F0F5F5;
+      --ds-text-body: #3D4F50;
+      --ds-text-disabled: #8B9E9F;
+      --ds-border-input: #6D8182;
+      --ds-border-hover: #536768;
+      --ds-border-focus: #038389;
+      --ds-border-error: #C8291E;
+      --ds-border-subtle: #CBD6D7;
+      --ds-radius-input: 3px;
+      --ds-radius-modal: 12px;
+      --ds-shadow-lg: 0 0 24px rgba(0, 90, 90, .15);
+
+      --sidebar-w: 272px;
+      --header-h: 55px;
+      --grid-step: 158px;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; }
+    body {
+      font-family: var(--ms-font);
+      color: var(--ms-text);
+      background: var(--ms-teal-400);
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: var(--ms-link); text-decoration: none; transition: var(--ms-transition); }
+    a:hover { text-decoration: underline; }
+    button, input, select { font: inherit; }
+    img { display: block; }
+
+    /* ---------- Šoninis meniu ---------- */
+    .sidebar {
+      position: fixed; inset: 0 auto 0 0;
+      width: var(--sidebar-w);
+      padding: 29px 29.5px 40px;
+      background: var(--ms-teal-400);
+      overflow-y: auto;
+    }
+    .sidebar__logo { display: block; width: 102px; height: 30.24px; margin-bottom: 33px; }
+    .side-nav { list-style: none; margin: 0; padding: 0; }
+    .side-nav a {
+      display: flex; align-items: center; justify-content: space-between;
+      color: var(--ms-teal-800);
+      font-size: 15px; line-height: 18px;
+    }
+    .side-nav--main li + li { margin-top: 17px; }
+    .side-nav--main a { justify-content: flex-start; gap: 10px; font-weight: 600; }
+    .side-nav--main .ico { width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; flex: none; }
+    .side-nav--sub li + li { margin-top: 16.5px; }
+    .sidebar__divider { height: 0; border: 0; border-top: 1.5px solid var(--ms-teal-500); margin: 29px 0 30px; width: 213px; opacity: .6; }
+    .badge {
+      min-width: 32px; height: 18px; padding: 0 6px;
+      border-radius: 11px;
+      background: var(--ms-teal-500); color: var(--ms-white);
+      font-size: 14px; font-weight: 600; line-height: 18px; text-align: center;
+    }
+    .side-group { margin-top: 32px; display: flex; align-items: center; gap: 4px; margin-bottom: 15px; }
+    .side-group span { font-size: 14px; font-weight: 600; line-height: 18px; color: var(--ms-teal-800); }
+
+    /* ---------- Pagrindinė dalis ---------- */
+    .main {
+      position: relative;
+      margin-left: var(--sidebar-w);
+      min-height: 100vh;
+      background: var(--ms-white);
+      border-top: 5px solid var(--ms-teal-400);
+      border-top-left-radius: 15px;
+      overflow: hidden;
+    }
+    .grid-bg {
+      position: absolute; left: 0; right: 0; top: var(--header-h); height: 542px;
+      background: linear-gradient(180deg, var(--ms-cream-50) 22.8%, var(--ms-white));
+      pointer-events: none;
+    }
+    .grid-bg::before {
+      content: ""; position: absolute; inset: 0;
+      background-image:
+        linear-gradient(to right, var(--ms-cream-300) 1px, transparent 1px),
+        linear-gradient(to bottom, var(--ms-cream-300) 1px, transparent 1px);
+      background-size: var(--grid-step) var(--grid-step);
+      opacity: .55;
+      -webkit-mask-image: linear-gradient(180deg, #000 362px, transparent 542px);
+              mask-image: linear-gradient(180deg, #000 362px, transparent 542px);
+    }
+
+    /* Viršutinė juosta */
+    .topbar {
+      position: relative; z-index: 1;
+      height: var(--header-h);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 35px 0 31.5px;
+      background: var(--ms-teal-75);
+      border-bottom: 1px solid var(--ms-border);
+      border-top-left-radius: 6px;
+    }
+    .search {
+      position: relative; width: 548px; height: 31px;
+    }
+    .search input {
+      width: 100%; height: 100%;
+      padding: 0 44px 0 16px;
+      border: 1px solid rgba(102, 153, 153, .29);
+      border-radius: 15.5px;
+      background: var(--ms-white);
+      color: var(--ms-teal-900);
+      font-size: 15px;
+      outline: none;
+      transition: var(--ms-transition);
+    }
+    .search input::placeholder { color: var(--ms-teal-600); }
+    .search input:focus { border-color: var(--ms-border-focus); box-shadow: var(--ms-focus-ring); }
+    .search button {
+      position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+      width: 24px; height: 23px; padding: 0; border: 0; background: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .top-actions { display: flex; align-items: center; gap: 32px; }
+    .top-actions a {
+      display: flex; align-items: center; gap: 6px;
+      color: var(--ms-teal-800); font-size: 15px; font-weight: 600; line-height: 17px;
+    }
+    .top-actions .ico { width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; }
+    .top-actions .ico--dim { opacity: .7; }
+    .head-ico { position: relative; width: 24px; height: 24px; }
+    .head-ico img:first-child { position: absolute; left: 1px; top: 1px; }
+    .head-ico img:last-child { position: absolute; left: 4.17px; top: 5.1px; }
+
+    /* Turinio išdėstymas */
+    .page {
+      position: relative; z-index: 1;
+      display: grid;
+      grid-template-columns: 678px 303px;
+      column-gap: 35px;
+      padding: 42px 0 80px 104px;
+    }
+
+    .crumbs {
+      display: flex; align-items: center; justify-content: space-between;
+      margin: 0 0 11px -4px;
+      height: 28px;
+    }
+    .crumbs__back { display: flex; align-items: center; color: var(--ms-teal-900); font-size: 15px; line-height: 19.5px; }
+    .crumbs__back img { transform: rotate(180deg); }
+    .crumbs__tools { display: flex; }
+    .icon-btn {
+      width: 28px; height: 28px; padding: 0; border: 0; border-radius: var(--ms-radius-sm);
+      background: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: var(--ms-transition);
+    }
+    .icon-btn:hover { background: var(--ms-teal-150); }
+
+    /* ---------- Skaičiuoklė ---------- */
+    .calc {
+      position: relative;
+      padding: 45px 49px 49px 49px;
+      background: var(--ms-calc-bg);
+      border: 1px solid var(--ms-teal-400);
+      border-radius: var(--ms-radius-calc);
+    }
+    .calc__title { margin: 0; font-size: var(--ms-fs-h1-tool); font-weight: 700; line-height: 38px; color: var(--ms-teal-900); }
+    .calc__lead { margin: 6px 0 0 1px; font-size: 15px; line-height: 25px; color: var(--ms-teal-900); }
+
+    .illus { position: absolute; width: 84.19px; height: 67px; transform: scaleX(-1); }
+    .illus img { position: absolute; }
+    .illus .p1 { left: 5.77%; top: 13.54%; width: 93.9%; height: 85.94%; }
+    .illus .p2 { left: 65.6%; top: 0; width: 34.4%; height: 42.1%; }
+    .illus .p3 { left: 16.24%; top: 67%; width: 20.21%; height: 33%; }
+    .illus .p4 { left: -1.71%; top: 74.05%; width: 22.2%; height: 25.95%; }
+    .calc .illus { left: 555.7px; top: 39px; }
+
+    .calc__row {
+      display: grid;
+      grid-template-columns: 323px 79px 56px 89px;
+      column-gap: 11px;
+      margin-top: 37px;
+      margin-left: -1px;
+    }
+    .calc__head .label {
+      display: block;
+      font-size: 16px; font-weight: 600; line-height: 21px;
+      color: var(--ms-teal-900);
+    }
+    .rows { display: flex; flex-direction: column; gap: 12px; margin: 8px 0 0 -1px; }
+    .row {
+      position: relative;
+      display: grid;
+      grid-template-columns: 323px 79px 56px 89px;
+      column-gap: 11px;
+    }
+    .row__remove {
+      position: absolute; right: -38px; top: 8px;
+      width: 24px; height: 24px; padding: 0;
+      border: 0; border-radius: var(--ms-radius-sm);
+      background: none; color: var(--ms-teal-600);
+      font-size: 22px; line-height: 22px; cursor: pointer;
+      transition: var(--ms-transition);
+    }
+    .row__remove:hover { background: var(--ms-white); color: var(--ms-teal-900); }
+    /* Klaida – DS V.3 Inputs/Error */
+    .row__error {
+      grid-column: 1 / -1;
+      margin-top: 8px;
+      font-size: 13px; line-height: 20px;
+      color: var(--ds-text-body);
+    }
+    .row__error[hidden] { display: none; }
+    .row__error .msg { display: flex; align-items: center; gap: 4px; }
+    .row__error .msg img { flex: none; }
+    .row__error .suggest { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 8px; }
+    .row__error .suggest button {
+      height: 30px; padding: 0 12px;
+      border: 1px solid var(--ds-border-focus); border-radius: 6px;
+      background: var(--ds-surface-card); color: #006A6E;
+      font-size: 13px; font-weight: 600; cursor: pointer;
+      transition: var(--ms-transition);
+    }
+    .row__error .suggest button:hover { background: var(--ds-border-focus); color: var(--ms-white); }
+
+    /* Sąrašas (bendras A ir B variantams) – DS V.3 Modal paviršius */
+    .listbox {
+      list-style: none; margin: 0; padding: 8px;
+      max-height: 288px; overflow-y: auto;
+    }
+    .option {
+      padding: 8px 12px;
+      border-radius: var(--ds-radius-input);
+      font-size: 15px; line-height: 24px;
+      color: var(--ds-text-body);
+      cursor: pointer;
+      transition: background-color .1s ease;
+    }
+    .option mark { background: none; color: inherit; font-weight: 700; }
+    .option:hover { background: var(--ds-surface-secondary); }
+    .option.is-active { background: var(--ds-surface-secondary); box-shadow: inset 2px 0 0 var(--ds-border-focus); }
+    .option.is-selected { font-weight: 600; }
+    .option.is-selected::after { content: "✓"; float: right; color: var(--ds-border-focus); font-weight: 700; }
+    .listbox__empty { padding: 8px 12px; font-size: 14px; line-height: 20px; color: var(--ds-text-disabled); }
+    .popup {
+      position: absolute; left: 0; right: 0; top: calc(100% + 6px); z-index: 20;
+      background: var(--ds-surface-card);
+      border: 1px solid var(--ds-border-subtle);
+      border-radius: var(--ds-radius-modal);
+      box-shadow: var(--ds-shadow-lg);
+      overflow: hidden;
+      display: none;
+    }
+    .popup.is-open { display: block; animation: popup-in .15s ease; }
+    @keyframes popup-in { from { opacity: 0; transform: translateY(-4px); } }
+    .popup__hint { padding: 4px 12px; font-size: 13px; line-height: 20px; color: var(--ds-text-disabled); }
+
+    /* A: rašomas laukas */
+    .combo input {
+      padding: 0 38px 0 10px;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .combo input::placeholder, .picker__value.is-placeholder { color: var(--ms-text-subtle); }
+    .control__chev { transition: transform .15s ease; }
+    .is-expanded .control__chev { transform: rotate(-90deg); }
+
+    /* B: mygtukas + paieška skydelyje */
+    .picker { position: relative; }
+    .picker__btn {
+      display: flex; align-items: center;
+      padding: 0 38px 0 10px;
+      text-align: left; cursor: pointer;
+    }
+    .picker__btn:focus-visible { outline: none; border-color: var(--ms-teal-600); box-shadow: var(--ms-focus-ring); }
+    .picker__value { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    /* Paieškos laukelis – DS V.3 Inputs/Default */
+    .popup__search { position: relative; padding: 12px 12px 4px; }
+    .popup__search input {
+      width: 100%; height: 36px;
+      padding: 0 10px 0 36px;
+      background: var(--ds-surface-secondary);
+      border: 1px solid var(--ds-border-input); border-radius: var(--ds-radius-input);
+      color: var(--ds-text-body); font-size: 14px; line-height: 20px;
+      outline: none; transition: border-color .15s ease;
+    }
+    .popup__search input::placeholder { color: var(--ds-text-disabled); }
+    .popup__search input:hover { border-color: var(--ds-border-hover); }
+    .popup__search input:focus { border-color: var(--ds-border-focus); box-shadow: inset 0 0 0 1px var(--ds-border-focus); }
+    .popup__search img { position: absolute; left: 22px; top: 21px; pointer-events: none; opacity: .8; }
+    .popup__search + .listbox { border-top: 0; }
+
+    .control.is-invalid { border-color: var(--ds-border-error); box-shadow: inset 0 0 0 1px var(--ds-border-error); }
+    .readonly.is-empty, .total output.is-empty { color: var(--ms-text-subtle); }
+
+    /* Prototipo variantų jungiklis (ne dizaino dalis) */
+    .proto-switch {
+      position: fixed; right: 16px; bottom: 16px; z-index: 50;
+      display: flex; align-items: center; gap: 8px;
+      padding: 8px 10px 8px 14px;
+      background: var(--ms-teal-900); color: var(--ms-white);
+      border-radius: var(--ms-radius-pill);
+      box-shadow: var(--ms-shadow-float);
+      font-size: 13px;
+    }
+    .proto-switch button {
+      padding: 5px 12px; border: 0; border-radius: var(--ms-radius-pill);
+      background: transparent; color: var(--ms-white); font-size: 13px; font-weight: 600; cursor: pointer;
+      transition: var(--ms-transition);
+    }
+    .proto-switch button[aria-pressed="true"] { background: var(--ms-white); color: var(--ms-teal-900); }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { transition: none !important; animation: none !important; }
+    }
+    .control {
+      position: relative;
+      width: 100%; height: 40px;
+      border: 1px solid var(--ms-teal-400);
+      border-radius: var(--ms-radius-input);
+      background: var(--ms-white);
+      color: var(--ms-teal-900);
+      font-size: 15px; line-height: 20px;
+      transition: var(--ms-transition);
+    }
+    .control:focus-within { border-color: var(--ms-teal-600); box-shadow: var(--ms-focus-ring); }
+    .control select, .control input {
+      width: 100%; height: 100%;
+      border: 0; outline: none; background: transparent; color: inherit;
+    }
+    .control select {
+      appearance: none; -webkit-appearance: none;
+      padding: 0 38px 0 10px;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      cursor: pointer;
+    }
+    .control__chev {
+      position: absolute; right: 13px; top: 9px;
+      transform: rotate(90deg); pointer-events: none;
+    }
+    .control--days input {
+      padding: 0 24px 0 4px; text-align: right;
+      -moz-appearance: textfield;
+    }
+    .control--days input::-webkit-outer-spin-button,
+    .control--days input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+    .spin {
+      position: absolute; right: 5px; top: 11px;
+      display: flex; flex-direction: column; align-items: center;
+    }
+    .spin button {
+      width: 13px; height: 8px; padding: 0; border: 0; background: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; overflow: hidden;
+    }
+    .spin .up img { transform: scaleY(-1); }
+    .spin .down { margin-top: -1px; }
+    .spin .down img { width: 13px; height: 13px; margin-top: -4px; }
+    .readonly {
+      display: flex; align-items: center; justify-content: flex-end;
+      height: 40px; padding: 8px 10px;
+      border: 1px solid var(--ms-teal-400);
+      border-radius: var(--ms-radius-sm);
+      background: var(--ms-calc-readonly);
+      color: var(--ms-teal-900);
+      font-size: 15px; line-height: 20px;
+    }
+
+    .calc__foot {
+      display: flex; align-items: flex-end; justify-content: space-between;
+      margin-top: 31px;
+    }
+    .btn-add {
+      height: 32px; padding: 5px 23px 5px 15px;
+      border: 1px solid var(--ms-link); border-radius: var(--ms-radius-sm);
+      background: var(--ms-calc-bg); color: var(--ms-link);
+      font-size: var(--ms-fs-small); font-weight: 600; line-height: 22px;
+      white-space: pre; cursor: pointer;
+      transition: var(--ms-transition);
+    }
+    .btn-add:hover { background: var(--ms-white); }
+    .total { display: flex; align-items: baseline; gap: 10px; color: var(--ms-teal-900); margin-bottom: -2px; }
+    .total span { font-size: 15px; font-weight: 600; }
+    .total output { font-size: 28px; font-weight: 700; line-height: 33px; }
+
+    /* ---------- Turinys po skaičiuokle ---------- */
+    .info h2 { margin: 44px 0 19px; font-size: 23px; font-weight: 700; line-height: 32px; color: var(--ms-text); }
+    .info p { margin: 0; font-size: 15px; line-height: 26px; }
+    .faq { margin-top: 36px; }
+    .faq h3 { margin: 0 0 12px; font-size: var(--ms-fs-h3); font-weight: 700; line-height: 30px; color: var(--ms-text); }
+    .faq p + p { margin-top: 12px; }
+
+    /* ---------- Atmintinė ---------- */
+    .aside { position: relative; margin-top: 40px; }
+    .memo {
+      position: relative;
+      height: 358px;
+      padding: 27px 0 0 38px;
+      background: var(--ms-cream-100);
+      border: 1px solid var(--ms-cream-300);
+      border-radius: var(--ms-radius-calc);
+      overflow: hidden;
+    }
+    .memo::after {
+      content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 127px;
+      background-image: radial-gradient(var(--ms-cream-300) 1px, transparent 1.2px);
+      background-size: 24px 24px;
+      background-position: 4px 4px;
+      -webkit-mask-image: linear-gradient(180deg, transparent, #000 60%);
+              mask-image: linear-gradient(180deg, transparent, #000 60%);
+      pointer-events: none;
+    }
+    .memo__eyebrow { margin: 0; font-size: 12px; line-height: 22px; text-transform: uppercase; }
+    .memo__title { margin: 6px 0 0; width: 251px; font-size: 16px; font-weight: 600; line-height: 25px; }
+    .memo__link {
+      display: inline-flex; align-items: center; gap: 4px; margin-top: 12px;
+      font-size: 15px; font-weight: 600; line-height: 17.7px;
+    }
+    .memo__file { position: absolute; left: 37px; top: 177px; width: 107px; height: 143px; z-index: 1; }
+    .sheet {
+      position: absolute; width: 91.61px; height: 135.9px;
+      background: var(--ms-white);
+      border: .916px solid var(--ms-teal-400);
+      border-radius: 3.12px;
+    }
+    .sheet--a { left: 9.6px; top: 3.3px; transform: rotate(4.39deg); }
+    .sheet--b { left: 5.6px; top: 8.7px; transform: rotate(2.21deg); }
+    .cover {
+      position: absolute; left: 0; top: 14.25px;
+      width: 94px; height: 140px;
+      border: 1.03px solid var(--ms-teal-400); border-radius: 5.07px;
+      background: linear-gradient(214deg, #BBDDDD 0%, #FFF 100%);
+      overflow: hidden;
+    }
+    .cover::before {
+      content: ""; position: absolute; inset: 0; opacity: .4;
+      background: linear-gradient(36deg, #E6C8D6 0.3%, rgba(255, 255, 255, 0) 72.5%);
+    }
+    .cover__tag { position: absolute; left: 0; top: 0; width: 25px; height: 10.14px; background: var(--ms-teal-400); border-bottom-right-radius: 5.52px; }
+    .cover__tag img { position: absolute; left: 3.4px; top: 2.4px; }
+    .cover__content {
+      position: relative; margin: 31.5px auto 0; width: 76.7px;
+      display: flex; flex-direction: column; align-items: center; gap: 12px;
+    }
+    .cover__content p {
+      margin: 0;
+      font-family: "Enriqueta", Georgia, serif; font-weight: 600;
+      font-size: 7.8px; line-height: 1.3; text-align: center; color: var(--ms-teal-900);
+    }
+    .cover__badge { position: relative; width: 48.1px; height: 43.2px; }
+    .cover__badge > img { transform: scaleY(-1); }
+    .cover__badge .illus { left: 4.14px; top: 3.46px; width: 39.81px; height: 31.68px; }
+    .memo__person {
+      position: absolute; left: 109px; top: 150px;
+      width: 193px; height: 208px;
+      border-radius: 8px; overflow: hidden;
+    }
+    .memo__person img {
+      position: absolute; left: 5px; top: 15.6px;
+      width: 251px; height: 250px; max-width: none;
+      transform: scaleX(-1);
+    }
+
+    .trust { margin: 41px 0 0; text-align: center; font-size: 16px; line-height: 25px; }
+    .trust b { font-weight: 700; }
+    .logos {
+      position: relative; margin: -6px 0 0 -15px;
+      width: 350px; height: 689px;
+      opacity: .52; overflow: hidden;
+    }
+    .logos img { position: absolute; }
+    .logos::after {
+      content: ""; position: absolute; left: 40px; right: 16px; top: 535px; bottom: 15px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0), #fff);
+    }
+  </style>
+</head>
+<body>
+
+  <aside class="sidebar">
+    <a href="#"><img class="sidebar__logo" src="assets/img/logo.svg" width="102" height="30.24" alt="Mokesčių SUFLERIS"></a>
+
+    <ul class="side-nav side-nav--main">
+      <li><a href="#"><span class="ico"><img src="assets/icons/kelrodis.svg" width="15.75" height="17.25" alt=""></span>Kaip veikia SUFLERIS</a></li>
+      <li><a href="#"><span class="ico"><img src="assets/icons/home.svg" width="20" height="20" alt=""></span>Naujausi</a></li>
+      <li><a href="#"><span class="ico"><img src="assets/icons/flag-20.svg" width="20" height="20" alt=""></span>Mano pasižymėti</a></li>
+    </ul>
+
+    <hr class="sidebar__divider">
+
+    <ul class="side-nav side-nav--sub">
+      <li><a href="#">Mokesčių naujienos <span class="badge">155</span></a></li>
+      <li><a href="#">Praktinės situacijos</a></li>
+      <li><a href="#">Sąvadai ir teminiai rinkiniai</a></li>
+      <li><a href="#">Seminarai ir vaizdo įrašai</a></li>
+      <li><a href="#">Renginių kalendorius</a></li>
+      <li><a href="#">Skaičiuoklės</a></li>
+      <li><a href="#">Specialus pagalbos rinkinys</a></li>
+      <li><a href="#">Užduokite savo klausimą</a></li>
+    </ul>
+
+    <div class="side-group">
+      <img src="assets/img/pro-label.svg" width="34" height="15" alt="PRO">
+      <span>turinys</span>
+    </div>
+    <ul class="side-nav side-nav--sub">
+      <li><a href="#">Pro mikroskopą</a></li>
+      <li><a href="#">Geroji praktika</a></li>
+      <li><a href="#">Pro komentarai</a></li>
+      <li><a href="#">Profilaktika</a></li>
+    </ul>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <form class="search" role="search" onsubmit="return false">
+        <input type="search" placeholder="Ieškoti pagal frazę" aria-label="Ieškoti pagal frazę">
+        <button type="submit" aria-label="Ieškoti"><img src="assets/icons/padidke.svg" width="18" height="18" alt=""></button>
+      </form>
+      <nav class="top-actions">
+        <a href="#"><span class="ico"><img src="assets/icons/ragelis.svg" width="24" height="24" alt=""></span>Susisiekti</a>
+        <a href="#"><span class="ico ico--dim"><img src="assets/icons/skaitliukai.svg" width="20" height="20.5" alt=""></span>Planų kainos</a>
+        <a href="#"><span class="head-ico ico--dim" style="opacity:.7"><img src="assets/icons/head-circle.svg" width="22" height="22" alt=""><img src="assets/icons/head.svg" width="15.72" height="14.28" alt=""></span>Laurynas</a>
+      </nav>
+    </header>
+
+    <div class="grid-bg" aria-hidden="true"></div>
+
+    <div class="page">
+      <main>
+        <div class="crumbs">
+          <a class="crumbs__back" href="#"><img src="assets/icons/kryptis-back.svg" width="20" height="20" alt="">Skaičiuoklės</a>
+          <div class="crumbs__tools">
+            <button class="icon-btn" type="button" aria-label="Dalintis"><img src="assets/icons/dalintis.svg" width="28" height="28" alt=""></button>
+            <button class="icon-btn" type="button" aria-label="Pasižymėti"><img src="assets/icons/pasizymeti.svg" width="12.5" height="16.5" alt=""></button>
+          </div>
+        </div>
+
+        <section class="calc" aria-labelledby="calc-title">
+          <h1 class="calc__title" id="calc-title">Dienpinigių skaičiuoklė</h1>
+          <p class="calc__lead">Užsienio ir Lietuvos komandiruotės dienpinigiai nuo 2023-08-01.</p>
+
+          <div class="illus" aria-hidden="true">
+            <img class="p1" src="assets/img/calc-1.svg" width="79.06" height="57.58" alt="">
+            <img class="p2" src="assets/img/calc-2.svg" width="28.96" height="28.21" alt="">
+            <img class="p3" src="assets/img/calc-3.svg" width="17.01" height="22.11" alt="">
+            <img class="p4" src="assets/img/calc-4.svg" width="18.69" height="17.39" alt="">
+          </div>
+
+          <div class="calc__row calc__head" aria-hidden="true">
+            <span class="label">Šalis</span>
+            <span class="label">Norma</span>
+            <span class="label">Dienos</span>
+            <span class="label">Suma</span>
+          </div>
+
+          <div class="rows" id="rows"></div>
+
+          <div class="calc__foot">
+            <button class="btn-add" id="addRow" type="button">+  Pridėti šalį</button>
+            <div class="total"><span>Bendra suma:</span> <output id="total" class="is-empty">–</output></div>
+          </div>
+        </section>
+
+        <section class="info">
+          <h2>Daugiau informacijos apie dienpinigius</h2>
+          <p>Žemiau pateikiame trumpus atsakymus į buhalterių mums užduodamus klausimus apie dienpinigių apskaičiavimą, mokėjimą ir apmokestinimą. Šie atsakymai – tai tik nedidelė Mokesčių SUFLERIO turinio dalis. Daugiau išnagrinėtų praktinių situacijų, mokesčių naujienų ir renginių įrašų dienpinigių tema galite rasti sąvade <a href="https://www.mokesciu-sufleris.lt/savadai/komandiruotes.html" target="_blank">„Komandiruotės“</a> arba naudodamiesi <a href="https://www.mokesciu-sufleris.lt/paieska/?term=dienpinigiai" target="_blank">paieška</a>.</p>
+
+          <article class="faq">
+            <h3>Darbuotojas dirba ne visą darbo dieną. Ar dienpinigiai apmokestinami ta pačia tvarka?</h3>
+            <p>Dienpinigių apmokestinimas priklauso nuo darbo sutartyje nustatyto darbo užmokesčio dydžio. Jeigu jis yra mažesnis nei MMA × 1,65, tai dalis dienpinigių bus apmokestinama GPM bei „Sodros“ įmokomis. Į darbo laiko normą (etato dydį) nėra atsižvelgiama.</p>
+            <p>Plačiau skaitykite: <a href="https://www.mokesciu-sufleris.lt/mazas-atlyginimas-ne-visas-darbo-laikas-ir-komandiruote-i-uzsieni.html?internal_referer=savadai" target="_blank">Mažas atlyginimas, ne visas darbo laikas ir komandiruotė į užsienį</a></p>
+          </article>
+        </section>
+      </main>
+
+      <aside class="aside">
+        <div class="memo">
+          <p class="memo__eyebrow">Atmintinė atsisiuntimui</p>
+          <p class="memo__title">Dienpinigiai Lietuvoje ir užsienyje: ką turi žinoti buhalteris</p>
+          <a class="memo__link" href="#">Atsisiųsti <img src="assets/icons/arrow-right.svg" width="13" height="13" alt=""></a>
+
+          <div class="memo__file" aria-hidden="true">
+            <div class="sheet sheet--a"></div>
+            <div class="sheet sheet--b"></div>
+            <div class="cover">
+              <div class="cover__tag"><img src="assets/img/cover-logo.svg" width="16.56" height="4.91" alt=""></div>
+              <div class="cover__content">
+                <p>Dienpinigiai Lietuvoje ir užsienyje: ką turi žinoti buhalteris</p>
+                <div class="cover__badge">
+                  <img src="assets/img/cover-vector.svg" width="48.09" height="43.23" alt="">
+                  <div class="illus">
+                    <img class="p1" src="assets/img/cover-calc-1.svg" width="37.29" height="27.14" alt="">
+                    <img class="p2" src="assets/img/cover-calc-2.svg" width="13.6" height="13.16" alt="">
+                    <img class="p3" src="assets/img/cover-calc-3.svg" width="7.95" height="10.36" alt="">
+                    <img class="p4" src="assets/img/cover-calc-4.svg" width="8.79" height="8.17" alt="">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="memo__person" aria-hidden="true"><img src="assets/img/atmintine-asmuo.png" alt=""></div>
+        </div>
+
+        <p class="trust">Mumis pasitiki daugiau nei<br><b>5000</b> Lietuvos įmonių</p>
+
+        <div class="logos" aria-label="Klientų logotipai">
+          <img src="assets/logos/spa-vilnius.png" style="left:199.21px;top:21.69px;width:84.58px;height:94.29px" alt="Spa Vilnius">
+          <img src="assets/logos/telia.svg" style="left:56.17px;top:47.2px" width="101.92" height="40.21" alt="Telia">
+          <img src="assets/logos/kika.png" style="left:58.93px;top:144.18px;width:72.79px;height:58.24px" alt="Kika">
+          <img src="assets/logos/drogas.svg" style="left:172.79px;top:155.65px" width="124.89" height="33.97" alt="Drogas">
+          <img src="assets/logos/lrt.svg" style="left:211.09px;top:250.02px" width="65.18" height="29.81" alt="LRT">
+          <img src="assets/logos/lonas.svg" style="left:48.45px;top:258.41px" width="103.99" height="20.8" alt="Lonas">
+          <img src="assets/logos/saules-gojus.svg" style="left:58.23px;top:338.37px" width="81.95" height="43.2" alt="Saulės gojus">
+          <img src="assets/logos/pergale.svg" style="left:183.88px;top:347.46px" width="107.46" height="20.8" alt="Pergalė">
+          <img src="assets/logos/dpd.svg" style="left:188.73px;top:421.64px" width="93.6" height="39.52" alt="DPD">
+          <img src="assets/logos/vinted.svg" style="left:43.68px;top:422.99px" width="103.3" height="33.28" alt="Vinted">
+          <img src="assets/logos/probro.svg" style="left:71.71px;top:507.61px" width="56.16" height="46.45" alt="ProBro">
+          <img src="assets/logos/sugihara.svg" style="left:176.17px;top:524.95px" width="126.87" height="18.03" alt="Sugihara">
+          <img src="assets/logos/volvo.svg" style="left:210.76px;top:595.66px" width="67.25" height="67.25" alt="Volvo">
+          <img src="assets/logos/vilvi.png" style="left:47.84px;top:603.29px;width:110.23px;height:51.3px" alt="Vilvi Group">
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <div class="proto-switch" role="group" aria-label="Šalies lauko variantas">
+    <span>Šalies laukas:</span>
+    <button type="button" data-variant="a">A. Rašymas</button>
+    <button type="button" data-variant="b">B. Sąrašas su paieška</button>
+  </div>
+
+  <script>
+    // Pavyzdinės normos (EUR/d.), ne tikri duomenys
+    const COUNTRIES = [
+      ['Airija', 58], ['Austrijos Respublika', 53], ['Belgijos Karalystė', 54],
+      ['Čekijos Respublika', 45], ['Danijos Karalystė', 61],
+      ['Didžiosios Britanijos ir Šiaurės Airijos Jungtinė Karalystė', 65],
+      ['Estijos Respublika', 45], ['Graikijos Respublika', 48], ['Gruzija', 40],
+      ['Ispanijos Karalystė', 50], ['Italijos Respublika', 53], ['Japonija', 60],
+      ['Jungtinės Amerikos Valstijos', 66], ['Kinijos Liaudies Respublika', 50],
+      ['Korėjos Liaudies Demokratinė Respublika', 33], ['Korėjos Respublika', 55],
+      ['Latvijos Respublika', 44], ['Lenkijos Respublika', 45], ['Lietuvos Respublika', 20],
+      ['Norvegijos Karalystė', 64], ['Nyderlandų Karalystė', 56], ['Prancūzijos Respublika', 55],
+      ['Suomijos Respublika', 57], ['Šveicarijos Konfederacija', 68], ['Švedijos Karalystė', 58],
+      ['Turkijos Respublika', 45], ['Ukraina', 40], ['Vokietijos Federacinė Respublika', 55],
+    ].map(([name, norm], i) => ({ id: i, name, norm }))
+     .sort((a, b) => a.name.localeCompare(b.name, 'lt'));
+
+    const ICON_CHEV = 'assets/icons/kryptis-select.svg';
+    const money = n => new Intl.NumberFormat('lt-LT', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n) + ' €';
+    const fold = s => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+    const esc = s => s.replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+    // Ieško pavadinimo pradžioje arba bet kurio žodžio pradžioje, nekreipiant dėmesio į lietuviškas raides
+    function matchIndex(name, q) {
+      const n = fold(name), f = fold(q.trim());
+      if (!f) return 0;
+      if (n.startsWith(f)) return 0;
+      const i = n.indexOf(' ' + f);
+      return i === -1 ? -1 : i + 1;
+    }
+    const exact = q => COUNTRIES.filter(c => matchIndex(c.name, q) !== -1);
+    // Jei tikslių atitikmenų nėra, nukerpa 1-2 paskutines raides (Vokietija → Vokietij → Vokietijos)
+    function lookup(q) {
+      const t = q.trim();
+      let items = exact(t);
+      if (items.length || t.length < 4) return { items, q: t, loose: false };
+      for (const k of [1, 2]) {
+        const s = t.slice(0, -k);
+        items = exact(s);
+        if (items.length) return { items, q: s, loose: true };
+      }
+      return { items: [], q: t, loose: false };
+    }
+    const search = q => lookup(q).items;
+    function highlight(name, q) {
+      const len = fold(q.trim()).length, i = matchIndex(name, q);
+      if (!len || i < 0) return esc(name);
+      return esc(name.slice(0, i)) + '<mark>' + esc(name.slice(i, i + len)) + '</mark>' + esc(name.slice(i + len));
+    }
+
+    const params = new URLSearchParams(location.search);
+    let variant = params.get('v') === 'b' ? 'b' : 'a';
+    let rows = [];
+    let seq = 0;
+    const rowsEl = document.getElementById('rows');
+    const totalEl = document.getElementById('total');
+
+    function newRow() {
+      return { id: ++seq, country: null, text: '', days: 1, touched: false };
+    }
+
+    /* ---------- Bendras sąrašo valdymas ---------- */
+    function listController(listEl, onPick) {
+      let items = [], active = 0, query = '';
+      function render(q, selected) {
+        const res = lookup(q);
+        query = res.q; items = res.items; active = 0;
+        if (selected) { const i = items.indexOf(selected); if (i > -1) active = i; }
+        listEl.innerHTML = items.length
+          ? (res.loose ? `<li class="popup__hint" role="presentation">Gal ieškote:</li>` : '') +
+            items.map((c, i) => `<li class="option${i === active ? ' is-active' : ''}${c === selected ? ' is-selected' : ''}" role="option" id="${listEl.id}-${i}" data-i="${i}">${highlight(c.name, query)}</li>`).join('')
+          : `<li class="listbox__empty">Tokios šalies neradome</li>`;
+        sync();
+      }
+      function sync() {
+        listEl.querySelectorAll('.option').forEach((el, i) => el.classList.toggle('is-active', i === active));
+        const el = listEl.querySelector('.is-active');
+        if (el) el.scrollIntoView({ block: 'nearest' });
+      }
+      function move(d) { if (!items.length) return; active = (active + d + items.length) % items.length; sync(); }
+      listEl.addEventListener('mousedown', e => e.preventDefault());
+      listEl.addEventListener('click', e => {
+        const li = e.target.closest('.option');
+        if (li) onPick(items[+li.dataset.i]);
+      });
+      return { render, move, current: () => items[active], count: () => items.length, activeId: () => items.length ? `${listEl.id}-${active}` : '' };
+    }
+
+    /* ---------- Eilutė ---------- */
+    function buildRow(row) {
+      const el = document.createElement('div');
+      el.className = 'row';
+      const listId = `list-${row.id}`;
+      const countryHtml = variant === 'a'
+        ? `<div class="control combo">
+             <input type="text" role="combobox" aria-label="Šalis" aria-autocomplete="list" aria-expanded="false" aria-controls="${listId}" placeholder="Pradėkite rašyti, pvz. Vokietija" autocomplete="off">
+             <img class="control__chev" src="${ICON_CHEV}" width="20" height="20" alt="">
+             <div class="popup"><ul class="listbox" role="listbox" id="${listId}"></ul></div>
+           </div>`
+        : `<div class="picker">
+             <button type="button" class="control picker__btn" aria-haspopup="listbox" aria-expanded="false" aria-label="Šalis">
+               <span class="picker__value"></span>
+               <img class="control__chev" src="${ICON_CHEV}" width="20" height="20" alt="">
+             </button>
+             <div class="popup">
+               <div class="popup__search">
+                 <img src="assets/icons/padidke.svg" width="18" height="18" alt="">
+                 <input type="text" placeholder="Ieškoti šalies..." aria-label="Ieškoti šalies" aria-controls="${listId}" autocomplete="off">
+               </div>
+               <ul class="listbox" role="listbox" id="${listId}"></ul>
+             </div>
+           </div>`;
+      el.innerHTML = `
+        ${countryHtml}
+        <output class="readonly js-norm" aria-label="Norma"></output>
+        <div class="control control--days">
+          <input type="number" min="1" max="365" inputmode="numeric" aria-label="Dienos">
+          <div class="spin">
+            <button class="up" type="button" tabindex="-1" aria-label="Daugiau dienų"><img src="assets/icons/spin-up.svg" width="6" height="6" alt=""></button>
+            <button class="down" type="button" tabindex="-1" aria-label="Mažiau dienų"><img src="assets/icons/spin-down.svg" width="13" height="13" alt=""></button>
+          </div>
+        </div>
+        <output class="readonly js-sum" aria-label="Suma"></output>
+        <button class="row__remove" type="button" aria-label="Pašalinti šalį" title="Pašalinti">×</button>
+        <div class="row__error" role="alert" hidden></div>`;
+
+      const daysInput = el.querySelector('.control--days input');
+      daysInput.value = row.days;
+
+      const pick = (c, focusDays = true) => {
+        row.country = c; row.text = c.name; row.touched = true;
+        close();
+        update();
+        if (focusDays) { daysInput.focus(); daysInput.select(); }
+      };
+
+      let open, close;
+      if (variant === 'a') {
+        const input = el.querySelector('.combo input');
+        const control = el.querySelector('.combo');
+        const popup = el.querySelector('.popup');
+        const list = listController(el.querySelector('.listbox'), c => pick(c));
+        input.value = row.text;
+        open = () => {
+          list.render(row.country && input.value === row.country.name ? '' : input.value, row.country);
+          popup.classList.add('is-open'); control.classList.add('is-expanded');
+          input.setAttribute('aria-expanded', 'true');
+          input.setAttribute('aria-activedescendant', list.activeId());
+        };
+        close = () => {
+          popup.classList.remove('is-open'); control.classList.remove('is-expanded');
+          input.setAttribute('aria-expanded', 'false');
+          input.removeAttribute('aria-activedescendant');
+        };
+        input.addEventListener('focus', () => { input.select(); open(); });
+        input.addEventListener('click', open);
+        input.addEventListener('input', () => {
+          row.text = input.value;
+          row.country = null;
+          open();
+          update();
+        });
+        input.addEventListener('keydown', e => {
+          const isOpen = popup.classList.contains('is-open');
+          if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+            e.preventDefault();
+            if (!isOpen) open(); else list.move(e.key === 'ArrowDown' ? 1 : -1);
+            input.setAttribute('aria-activedescendant', list.activeId());
+          } else if (e.key === 'Enter') {
+            e.preventDefault();
+            if (isOpen && list.count()) pick(list.current());
+          } else if (e.key === 'Tab') {
+            // Tab paima pažymėtą pasiūlymą, jei žmogus kažką įvedė
+            if (isOpen && list.count() && input.value.trim() && !row.country) pick(list.current(), false);
+          } else if (e.key === 'Escape') {
+            close();
+          }
+        });
+        input.addEventListener('blur', () => {
+          close();
+          row.touched = row.touched || input.value.trim() !== '';
+          if (row.country) input.value = row.country.name;
+          update();
+        });
+      } else {
+        const btn = el.querySelector('.picker__btn');
+        const popup = el.querySelector('.popup');
+        const q = el.querySelector('.popup__search input');
+        const list = listController(el.querySelector('.listbox'), c => pick(c));
+        open = () => {
+          q.value = '';
+          list.render('', row.country);
+          popup.classList.add('is-open'); el.querySelector('.picker').classList.add('is-expanded');
+          btn.setAttribute('aria-expanded', 'true');
+          q.focus();
+        };
+        close = (toButton) => {
+          if (!popup.classList.contains('is-open')) return;
+          popup.classList.remove('is-open'); el.querySelector('.picker').classList.remove('is-expanded');
+          btn.setAttribute('aria-expanded', 'false');
+          if (!row.country) { row.touched = true; update(); }
+          if (toButton) btn.focus();
+        };
+        btn.addEventListener('click', () => popup.classList.contains('is-open') ? close(true) : open());
+        btn.addEventListener('keydown', e => {
+          if (e.key === 'ArrowDown') { e.preventDefault(); open(); }
+        });
+        q.addEventListener('input', () => list.render(q.value, row.country));
+        q.addEventListener('keydown', e => {
+          if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); list.move(e.key === 'ArrowDown' ? 1 : -1); }
+          else if (e.key === 'Enter') { e.preventDefault(); if (list.count()) pick(list.current()); }
+          else if (e.key === 'Escape') { e.preventDefault(); close(true); }
+          else if (e.key === 'Tab') { close(); }
+        });
+        document.addEventListener('mousedown', e => { if (!el.querySelector('.picker').contains(e.target)) close(); });
+      }
+
+      // Dienos
+      const setDays = v => {
+        const n = Math.min(365, Math.max(1, parseInt(v, 10) || 1));
+        row.days = n; daysInput.value = n;
+        if (!row.country) row.touched = true;
+        update();
+      };
+      daysInput.addEventListener('input', () => {
+        const n = parseInt(daysInput.value, 10);
+        if (n >= 1) { row.days = Math.min(365, n); if (!row.country) row.touched = true; update(); }
+      });
+      daysInput.addEventListener('blur', () => setDays(daysInput.value));
+      el.querySelector('.spin .up').addEventListener('click', () => setDays(row.days + 1));
+      el.querySelector('.spin .down').addEventListener('click', () => setDays(row.days - 1));
+
+      el.querySelector('.row__remove').addEventListener('click', () => {
+        rows = rows.filter(r => r !== row);
+        renderRows();
+      });
+
+      // Klaidos pasiūlymai
+      el.querySelector('.row__error').addEventListener('click', e => {
+        const b = e.target.closest('[data-pick]');
+        if (b) {
+          const c = COUNTRIES.find(c => c.id === +b.dataset.pick);
+          const input = el.querySelector('.combo input');
+          if (input) input.value = c.name;
+          pick(c);
+        }
+      });
+
+      row.el = el;
+      return el;
+    }
+
+    function paintRow(row) {
+      const el = row.el;
+      const norm = el.querySelector('.js-norm'), sum = el.querySelector('.js-sum');
+      norm.textContent = row.country ? money(row.country.norm) : '–';
+      sum.textContent = row.country ? money(row.country.norm * row.days) : '–';
+      norm.classList.toggle('is-empty', !row.country);
+      sum.classList.toggle('is-empty', !row.country);
+
+      if (variant === 'b') {
+        const v = el.querySelector('.picker__value');
+        v.textContent = row.country ? row.country.name : 'Pasirinkite šalį';
+        v.classList.toggle('is-placeholder', !row.country);
+      }
+
+      const invalid = row.touched && !row.country;
+      el.querySelector('.combo, .picker__btn').classList.toggle('is-invalid', invalid);
+      const err = el.querySelector('.row__error');
+      err.hidden = !invalid;
+      if (invalid) {
+        const text = variant === 'a' ? row.text.trim() : '';
+        const hits = text ? search(text) : [];
+        const msg = t => `<div class="msg"><img src="assets/icons/exclamation-circle.svg" width="13" height="13" alt="">${t}</div>`;
+        if (text && !hits.length) {
+          err.innerHTML = msg(`Neradome šalies „${esc(text)}“. Pasirinkite šalį iš sąrašo.`);
+        } else if (hits.length) {
+          err.innerHTML = msg('Šalis nepasirinkta. Pasirinkite ją iš sąrašo.') + `
+            <div class="suggest">Gal turėjote omenyje:
+              ${hits.slice(0, 3).map(c => `<button type="button" data-pick="${c.id}">${esc(c.name)}</button>`).join('')}
+            </div>`;
+        } else {
+          err.innerHTML = msg('Pasirinkite šalį iš sąrašo.');
+        }
+      }
+      el.querySelector('.row__remove').hidden = rows.length < 2;
+    }
+
+    function update() {
+      rows.forEach(paintRow);
+      const valid = rows.filter(r => r.country);
+      totalEl.textContent = valid.length ? money(valid.reduce((s, r) => s + r.country.norm * r.days, 0)) : '–';
+      totalEl.classList.toggle('is-empty', !valid.length);
+    }
+
+    function renderRows() {
+      rowsEl.innerHTML = '';
+      rows.forEach(r => rowsEl.appendChild(buildRow(r)));
+      update();
+    }
+
+    document.getElementById('addRow').addEventListener('click', () => {
+      const r = newRow();
+      rows.push(r);
+      rowsEl.appendChild(buildRow(r));
+      update();
+      r.el.querySelector(variant === 'a' ? '.combo input' : '.picker__btn').focus();
+    });
+
+    // Variantų jungiklis
+    const switchBtns = document.querySelectorAll('.proto-switch button');
+    function setVariant(v) {
+      variant = v;
+      switchBtns.forEach(b => b.setAttribute('aria-pressed', String(b.dataset.variant === v)));
+      const url = new URL(location.href);
+      url.searchParams.set('v', v);
+      history.replaceState(null, '', url);
+      rows.forEach(r => { if (r.country) r.text = r.country.name; });
+      renderRows();
+    }
+    switchBtns.forEach(b => b.addEventListener('click', () => setVariant(b.dataset.variant)));
+
+    rows = [newRow()];
+    setVariant(variant);
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,96 @@
+/* Mokesčių SUFLERIS – live svetainės reikšmės kaip CSS kintamieji
+   Šaltinis: svetainės CSS analizė, 2026-10-07. Laikina, kol kuriama nauja DS.
+   Naudoti: įtraukti šį failą arba nukopijuoti :root bloką. Naujų reikšmių čia nepridėti
+   be patvirtinimo – žymėti „NAUJAS – įtraukti į DS“. */
+
+:root {
+  /* Tekstas */
+  --ms-text: #405359;
+  --ms-text-dark: #354547;
+  --ms-text-muted: #79878B;
+  --ms-text-subtle: #89999C;
+  --ms-text-teal: #669999;
+  --ms-heading-teal: #336666;
+  --ms-heading-page: #00555A;
+
+  /* Teal paletė */
+  --ms-teal-900: #00555A;
+  --ms-teal-800: #0F5354;
+  --ms-teal-700: #336666;
+  --ms-teal-650: #407777;
+  --ms-teal-600: #669999;
+  --ms-teal-500: #76A6A6;
+  --ms-teal-400: #99CCCC;
+  --ms-teal-300: #BBDDDD;
+  --ms-teal-250: #B3D9D9;
+  --ms-teal-200: #CBE1E3;
+  --ms-teal-150: #E0EEEE;
+  --ms-teal-100: #E9EFEF;
+  --ms-teal-75: #F1F7F7;
+  --ms-teal-50: #F3F6F6;
+  --ms-white: #FFFFFF;
+
+  /* Interaktyvios */
+  --ms-link: #219DA5;
+  --ms-link-visited: #669999;
+  --ms-primary: #53A9B1;          /* DS: kontrastas – spręsti naujoje DS */
+  --ms-primary-hover: #219DA5;
+  --ms-primary-disabled: #B8DEDF;
+
+  /* Rėmeliai */
+  --ms-border: #E9EFEF;
+  --ms-border-card: #CADBDB;
+  --ms-border-input: #CED4DA;
+  --ms-border-soft: #DBE0E0;
+  --ms-border-focus: #B3CCCC;
+
+  /* Būsenos (Bootstrap) */
+  --ms-success: #198754;
+  --ms-success-bg: #D1E7DD;
+  --ms-danger: #DC3545;
+  --ms-danger-bg: #F8D7DA;
+  --ms-warning: #FFC107;
+  --ms-warning-bg: #FFF3CD;
+
+  /* Tipografija */
+  --ms-font: "Open Sans", Arial, Helvetica, sans-serif;
+  --ms-fs-h1-tool: 28px;
+  --ms-fs-h2: 22px;
+  --ms-fs-h2-block: 20px;
+  --ms-fs-h3: 18px;
+  --ms-fs-h3-content: 16px;
+  --ms-fs-card-title: 15px;
+  --ms-fs-body: 14px;
+  --ms-fs-body-lg: 15px;
+  --ms-fs-small: 13px;
+  --ms-fs-eyebrow: 12px;
+  --ms-fs-xs: 11px;
+  --ms-lh-body: 1.5;
+
+  /* Kampai */
+  --ms-radius-sm: 4px;       /* mygtukai, skirtukai, checkbox */
+  --ms-radius-input: 6px;    /* laukai, pranešimai */
+  --ms-radius-card: 8px;     /* kortelės, blokai */
+  --ms-radius-tile: 11px;    /* pasirinkimo plytelės */
+  --ms-radius-toggle: 12px;
+  --ms-radius-pill: 20px;
+  --ms-radius-hero: 16px;
+
+  /* Šešėliai */
+  --ms-shadow-card: 0 4px 11px rgba(68, 119, 119, .33);
+  --ms-shadow-toast: 0 5px 8px rgba(68, 119, 119, .25);
+  --ms-shadow-float: 0 4px 11.7px rgba(102, 153, 153, .2);
+  --ms-shadow-panel: 1px 0 45px rgba(0, 85, 90, .3);
+  --ms-focus-ring: 0 0 0 .25rem rgba(102, 153, 153, .25);
+
+  /* Gradientai */
+  --ms-grad-tool-bg: linear-gradient(180deg, #E2F2F1, #BEE3E0);
+  --ms-grad-tool-line: linear-gradient(27deg, #76A6A6 66.19%, #99CCCC 113.55%);
+  --ms-grad-card-top: linear-gradient(135deg, #99CCCC, #CCE7E7 50%);
+
+  /* Perėjimai */
+  --ms-transition: all .2s ease-in-out;
+
+  /* Lūžio taškas (naudoti @media (min-width: 1000px)) */
+  --ms-bp-desktop: 1000px;
+}
