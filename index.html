@@ -669,7 +669,7 @@
     const totalEl = document.getElementById('total');
 
     function newRow() {
-      return { id: ++seq, country: null, days: 1, touched: false };
+      return { id: ++seq, country: null, days: 0, touched: false };
     }
 
     /* ---------- Sąrašo valdymas ---------- */
@@ -726,7 +726,7 @@
         </div>
         <output class="readonly js-norm" aria-label="Norma"></output>
         <div class="control control--days">
-          <input type="number" min="1" max="365" inputmode="numeric" aria-label="Dienos">
+          <input type="number" min="0" max="365" inputmode="numeric" aria-label="Dienos">
           <div class="spin">
             <button class="up" type="button" tabindex="-1" aria-label="Daugiau dienų"><img src="assets/icons/spin-up.svg" width="6" height="6" alt=""></button>
             <button class="down" type="button" tabindex="-1" aria-label="Mažiau dienų"><img src="assets/icons/spin-up.svg" width="6" height="6" alt=""></button>
@@ -780,14 +780,14 @@
 
       // Dienos
       const setDays = v => {
-        const n = Math.min(365, Math.max(1, parseInt(v, 10) || 1));
+        const n = Math.min(365, Math.max(0, parseInt(v, 10) || 0));
         row.days = n; daysInput.value = n;
         if (!row.country) row.touched = true;
         update();
       };
       daysInput.addEventListener('input', () => {
         const n = parseInt(daysInput.value, 10);
-        if (n >= 1) { row.days = Math.min(365, n); if (!row.country) row.touched = true; update(); }
+        if (n >= 0) { row.days = Math.min(365, n); if (!row.country) row.touched = true; update(); }
       });
       daysInput.addEventListener('blur', () => setDays(daysInput.value));
       el.querySelector('.spin .up').addEventListener('click', () => setDays(row.days + 1));
