@@ -374,14 +374,14 @@
     .spin .down { align-items: flex-start; padding-top: 1.5px; }
     .spin .up img { transform: scaleY(-1); }
     .spin button:hover img { opacity: .7; }
+    /* Kol šalis nepasirinkta, Dienos atrodo kaip neaktyvūs Norma ir Suma */
     .control--days.is-disabled {
-      background: var(--ds-surface-secondary);
-      border-color: var(--ds-border-subtle);
-      color: var(--ds-text-disabled);
+      background: var(--ms-calc-readonly);
+      border-color: var(--ms-teal-400);
+      color: var(--ms-text-subtle);
     }
-    .control--days.is-disabled input { cursor: not-allowed; }
-    .control--days.is-disabled .spin { opacity: .35; }
-    .control--days.is-disabled .spin button { cursor: not-allowed; }
+    .control--days.is-disabled input { padding-right: 0; text-align: center; cursor: not-allowed; }
+    .control--days.is-disabled .spin { display: none; }
     .readonly {
       display: flex; align-items: center; justify-content: flex-end;
       height: 40px; padding: 8px 10px;
@@ -584,7 +584,7 @@
 
           <div class="calc__foot">
             <button class="btn-add" id="addRow" type="button">+  Pridėti šalį</button>
-            <div class="total"><span>Bendra suma:</span> <output id="total" class="is-empty">–</output></div>
+            <div class="total"><span>Bendra suma:</span> <output id="total">0,00 €</output></div>
           </div>
         </section>
 
@@ -848,8 +848,8 @@
     function paintRow(row) {
       const el = row.el;
       const norm = el.querySelector('.js-norm'), sum = el.querySelector('.js-sum');
-      norm.textContent = row.country ? money(row.country.norm) : '–';
-      sum.textContent = row.country ? money(row.country.norm * row.days) : '–';
+      norm.textContent = money(row.country ? row.country.norm : 0);
+      sum.textContent = money(row.country ? row.country.norm * row.days : 0);
       norm.classList.toggle('is-empty', !row.country);
       sum.classList.toggle('is-empty', !row.country);
 
@@ -873,8 +873,7 @@
     function update() {
       rows.forEach(paintRow);
       const valid = rows.filter(r => r.country);
-      totalEl.textContent = valid.length ? money(valid.reduce((s, r) => s + r.country.norm * r.days, 0)) : '–';
-      totalEl.classList.toggle('is-empty', !valid.length);
+      totalEl.textContent = money(valid.reduce((s, r) => s + r.country.norm * r.days, 0));
     }
 
     function renderRows() {

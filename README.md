@@ -15,8 +15,8 @@ Kad prototipas neatrodytų kaip tikra svetainė, pagal nutylėjimą jis rodomas 
 - Atidarius be pasirinkimo nieko nepažymėta. Pradėjus rašyti pažymimas pirmas atitikmuo, Enter jį pasirenka. Pasirinkta šalis sąraše pažymėta varnele.
 - Paieška nekreipia dėmesio į lietuviškas raides ir ieško bet kurio žodžio pradžios („karalyst“ randa Jungtinę Karalystę).
 - Jei tikslaus atitikmens nėra, nukerpamos 1-2 paskutinės raidės ir rodoma „Gal ieškote:“ („Vokietija“ → „Vokietijos Federacinė Respublika“).
-- Kol šalis nepasirinkta, dienų laukas išjungtas (numatyta reikšmė 0). Pasirinkus šalį jis įsijungia ir kursorius pereina į jį.
-- Kol šalis nepasirinkta, Norma ir Suma rodo „–“, ne 0,00 €. Uždarius skydelį nepasirinkus šalies, laukas paraudonuoja ir rodoma „Pasirinkite šalį iš sąrašo.“
+- Kol šalis nepasirinkta, Norma, Dienos ir Suma neaktyvūs ir rodo blankius „0,00 €“ / „0“ (kaip live versijoje). Pasirinkus šalį dienų laukas įsijungia ir kursorius pereina į jį.
+- Uždarius skydelį nepasirinkus šalies, laukas paraudonuoja ir rodoma „Pasirinkite šalį iš sąrašo.“
 - Galima pridėti kelias šalis, skaičiuojama bendra suma.
 
 Normos yra **pavyzdinės**, ne tikri duomenys. Sąraše 28 šalys.
